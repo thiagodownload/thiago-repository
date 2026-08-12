@@ -1,18 +1,25 @@
 const SUPABASE_URL='https://odthqhyzrmjwynwpsdoc.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_VLXCKSh3i4aMvhN00WvvxA_ZprUQxC5';
 const SESSION_KEY='mundialIaAdminSession';
+const ADMIN_URL='https://thiagodownload.github.io/thiago-repository/admin.html';
 let dashboardData=[];
 
 const loginScreen=document.getElementById('loginScreen');
+const recoveryScreen=document.getElementById('recoveryScreen');
 const adminApp=document.getElementById('adminApp');
 const loginForm=document.getElementById('loginForm');
 const loginMessage=document.getElementById('loginMessage');
 const loginButton=document.getElementById('loginButton');
+const forgotPasswordButton=document.getElementById('forgotPasswordButton');
+const recoveryForm=document.getElementById('recoveryForm');
+const recoveryMessage=document.getElementById('recoveryMessage');
+const updatePasswordButton=document.getElementById('updatePasswordButton');
 
 function readSession(){try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null')}catch{return null}}
 function saveSession(s){sessionStorage.setItem(SESSION_KEY,JSON.stringify(s))}
 function clearSession(){sessionStorage.removeItem(SESSION_KEY)}
 function authHeaders(token){return {'apikey':SUPABASE_PUBLISHABLE_KEY,'Authorization':`Bearer ${token}`}}
+function cleanAuthUrl(){history.replaceState({},document.title,location.pathname+location.search)}
 
 async function signIn(email,password){
   const r=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
@@ -32,6 +39,22 @@ async function refreshSession(s){
   if(!r.ok)throw new Error('Sessão expirada.');
   const next={access_token:body.access_token,refresh_token:body.refresh_token||s.refresh_token,expires_at:body.expires_at,user:body.user||s.user};
   saveSession(next);return next;
+}
+
+async function requestPasswordRecovery(email){
+  const url=`${SUPABASE_URL}/auth/v1/recover?redirect_to=${encodeURIComponent(ADMIN_URL)}`;
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify({email})});
+  const body=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(body.msg||body.message||'Não foi possível enviar o e-mail de recuperação.');
+}
+
+async function updatePassword(token,password){
+  const r=await fetch(`${SUPABASE_URL}/auth/v1/user`,{
+    method:'PUT',headers:{...authHeaders(token),'Content-Type':'application/json'},body:JSON.stringify({password})
+  });
+  const body=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(body.msg||body.message||'Não foi possível atualizar a senha.');
+  return body;
 }
 
 async function ensureAdmin(token){
@@ -71,11 +94,31 @@ async function loadDashboard({allowRefresh=true}={}){
 }
 
 function showLogin(message=''){
-  adminApp.classList.add('hidden');loginScreen.classList.remove('hidden');
-  if(message)loginMessage.textContent=message;
+  adminApp.classList.add('hidden');recoveryScreen.classList.add('hidden');loginScreen.classList.remove('hidden');
+  loginMessage.textContent=message;
 }
-function showAdmin(){loginScreen.classList.add('hidden');adminApp.classList.remove('hidden')}
+function showRecovery(message=''){
+  adminApp.classList.add('hidden');loginScreen.classList.add('hidden');recoveryScreen.classList.remove('hidden');
+  recoveryMessage.textContent=message;
+}
+function showAdmin(){loginScreen.classList.add('hidden');recoveryScreen.classList.add('hidden');adminApp.classList.remove('hidden')}
 function setAdminStatus(text){const el=document.getElementById('adminStatus');if(el)el.textContent=text}
+
+async function handleAuthRedirect(){
+  const hash=new URLSearchParams(location.hash.replace(/^#/,''));
+  const errorDescription=hash.get('error_description');
+  if(errorDescription){cleanAuthUrl();clearSession();showLogin(decodeURIComponent(errorDescription.replace(/\+/g,' ')));return true}
+  const accessToken=hash.get('access_token');
+  if(!accessToken)return false;
+  const refreshToken=hash.get('refresh_token')||'';
+  const expiresAt=Number(hash.get('expires_at'))||Math.floor(Date.now()/1000)+Number(hash.get('expires_in')||3600);
+  const type=hash.get('type')||'';
+  const session={access_token:accessToken,refresh_token:refreshToken,expires_at:expiresAt,user:null};
+  saveSession(session);cleanAuthUrl();
+  if(type==='recovery'){showRecovery('Link de recuperação validado. Defina sua nova senha.');return true}
+  try{await ensureAdmin(accessToken);await loadDashboard();}catch(err){clearSession();showLogin(err.message||'Não foi possível concluir o acesso pelo link.');}
+  return true;
+}
 
 loginForm.addEventListener('submit',async e=>{
   e.preventDefault();loginMessage.textContent='';loginButton.disabled=true;loginButton.textContent='Entrando…';
@@ -86,6 +129,34 @@ loginForm.addEventListener('submit',async e=>{
   finally{loginButton.disabled=false;loginButton.textContent='Entrar no painel'}
 });
 
+forgotPasswordButton.addEventListener('click',async()=>{
+  const email=document.getElementById('adminEmail').value.trim();
+  if(!email){loginMessage.textContent='Informe seu e-mail acima para receber o link de recuperação.';document.getElementById('adminEmail').focus();return}
+  forgotPasswordButton.disabled=true;loginMessage.textContent='Enviando e-mail de recuperação…';
+  try{await requestPasswordRecovery(email);loginMessage.textContent='E-mail de recuperação enviado. Abra o link recebido e você voltará para esta tela para definir uma nova senha.'}
+  catch(err){loginMessage.textContent=err.message||'Não foi possível enviar o e-mail de recuperação.'}
+  finally{forgotPasswordButton.disabled=false}
+});
+
+recoveryForm.addEventListener('submit',async e=>{
+  e.preventDefault();recoveryMessage.textContent='';
+  const p1=document.getElementById('newPassword').value;
+  const p2=document.getElementById('confirmPassword').value;
+  if(p1.length<8){recoveryMessage.textContent='A nova senha deve ter pelo menos 8 caracteres.';return}
+  if(p1!==p2){recoveryMessage.textContent='As senhas informadas não coincidem.';return}
+  const s=readSession();
+  if(!s?.access_token){showLogin('O link de recuperação expirou. Solicite um novo link.');return}
+  updatePasswordButton.disabled=true;updatePasswordButton.textContent='Atualizando…';
+  try{
+    await updatePassword(s.access_token,p1);
+    await ensureAdmin(s.access_token);
+    document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';
+    showAdmin();await loadDashboard();
+  }catch(err){recoveryMessage.textContent=err.message||'Não foi possível atualizar a senha.'}
+  finally{updatePasswordButton.disabled=false;updatePasswordButton.textContent='Atualizar senha'}
+});
+
+document.getElementById('cancelRecovery').onclick=()=>{clearSession();showLogin()};
 document.getElementById('logoutButton').onclick=()=>{clearSession();dashboardData=[];showLogin('Sessão encerrada com segurança.')};
 document.getElementById('refreshDash').onclick=()=>loadDashboard();
 
@@ -121,4 +192,5 @@ document.getElementById('exportJson').onclick=()=>download('respostas_ia_mundial
 
 function burst(n=36){const c=document.getElementById('confetti');for(let i=0;i<n;i++){const s=document.createElement('span');s.className='spark';s.style.left=Math.random()*100+'vw';s.style.top='-20px';s.style.background=['var(--cyan)','var(--violet)','var(--gold)','var(--green)'][i%4];s.style.animationDelay=(Math.random()*.35)+'s';c.appendChild(s);setTimeout(()=>s.remove(),1300)}}
 const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.14});document.querySelectorAll('.reveal').forEach(e=>obs.observe(e));
-loadDashboard();
+
+(async()=>{const handled=await handleAuthRedirect();if(!handled)await loadDashboard()})();
