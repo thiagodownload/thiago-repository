@@ -9,6 +9,10 @@
   <meta name="description" content="Painel executivo protegido do Diagnóstico Corporativo de Inteligência Artificial." />
   <link rel="stylesheet" href="assets/styles.css" />
   <link rel="stylesheet" href="assets/admin.css" />
+  <style>
+    .auth-secondary{display:flex;justify-content:center;margin-top:14px}.auth-secondary button{font-size:14px}
+    .recovery-copy{color:var(--muted);line-height:1.55;margin:0 0 18px}.recovery-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.recovery-actions>*{flex:1 1 180px}
+  </style>
 </head>
 <body>
   <div class="aurora"></div><div class="particles"></div><div class="confetti" id="confetti"></div>
@@ -24,8 +28,25 @@
         <label>Senha<input type="password" id="adminPassword" autocomplete="current-password" required placeholder="••••••••" /></label>
         <button class="cta" id="loginButton" type="submit">Entrar no painel</button>
       </form>
+      <div class="auth-secondary"><button class="ghost" id="forgotPasswordButton" type="button">Esqueci minha senha</button></div>
       <div class="login-message" id="loginMessage" aria-live="polite"></div>
       <p class="footer-note">O acesso aos dados é validado pelo Supabase Auth e pelas políticas de segurança do banco.</p>
+    </div>
+  </section>
+
+  <section class="admin-login hidden" id="recoveryScreen">
+    <div class="admin-login-card">
+      <div class="brand admin-login-brand"><div class="logo">M</div><div>Mundial Atacadista<small>Recuperação de acesso administrativo</small></div></div>
+      <span class="kicker"><span class="pulse"></span> Recuperação segura</span>
+      <h1>Definir <span>nova senha</span></h1>
+      <p class="recovery-copy">O link de recuperação foi validado. Defina uma nova senha para sua conta administrativa.</p>
+      <form id="recoveryForm" class="admin-login-form">
+        <label>Nova senha<input type="password" id="newPassword" autocomplete="new-password" required minlength="8" placeholder="Mínimo de 8 caracteres" /></label>
+        <label>Confirmar nova senha<input type="password" id="confirmPassword" autocomplete="new-password" required minlength="8" placeholder="Repita a nova senha" /></label>
+        <button class="cta" id="updatePasswordButton" type="submit">Atualizar senha</button>
+      </form>
+      <div class="recovery-actions"><button class="secondary" id="cancelRecovery" type="button">Voltar ao login</button></div>
+      <div class="login-message" id="recoveryMessage" aria-live="polite"></div>
     </div>
   </section>
 
