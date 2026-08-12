@@ -1,7 +1,7 @@
 const SUPABASE_URL='https://odthqhyzrmjwynwpsdoc.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_VLXCKSh3i4aMvhN00WvvxA_ZprUQxC5';
 const SESSION_KEY='mundialIaAdminSession';
-const ADMIN_URL='https://thiagodownload.github.io/thiago-repository/admin.html';
+const ADMIN_URL=location.origin+location.pathname;
 let dashboardData=[];
 
 const loginScreen=document.getElementById('loginScreen');
