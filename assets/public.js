@@ -22,6 +22,16 @@ document.getElementById('stepList').innerHTML=steps.map((s,i)=>`<div class="step
 function val(name){const el=form.elements[name];if(!el)return '';if(el instanceof RadioNodeList)return el.value||'';return el.value||''}
 function arr(name){return [...form.querySelectorAll(`[name="${name}"]:checked`)].map(x=>x.value)}
 function shouldUserQs(){return val('situacao')==='Utilizo ferramentas de IA no trabalho'}
+function visibleQuestions(){return qs.filter(q=>!q.classList.contains('hidden'))}
+function setActiveStep(step){document.querySelectorAll('.step-item').forEach(i=>i.classList.toggle('active',i.dataset.stepname===step))}
+function updateActiveStepFromScroll(){
+  const visible=visibleQuestions();
+  if(!visible.length)return;
+  const marker=Math.min(window.innerHeight*.34,280);
+  let current=visible.find(q=>q.getBoundingClientRect().bottom>=marker);
+  if(!current)current=visible.at(-1);
+  setActiveStep(current.dataset.step);
+}
 function updateQuestionNumbers(){let n=0;qs.forEach(q=>{const title=q.querySelector('.qtitle');if(!title)return;if(q.classList.contains('hidden')){title.textContent=title.dataset.baseTitle||title.textContent.replace(/^\d+\.\s*/,'');return}n+=1;title.textContent=`${n}. ${title.dataset.baseTitle||title.textContent.replace(/^\d+\.\s*/,'')}`})}
 function updateConditional(){
   const show=shouldUserQs();
@@ -34,9 +44,12 @@ function updateConditional(){
   if(otherToolField)otherToolField.classList.toggle('hidden',!other);
   if(otherInput){otherInput.required=other;if(!other)otherInput.value=''}
   updateQuestionNumbers();
+  requestAnimationFrame(updateActiveStepFromScroll);
 }
 form.addEventListener('change',()=>{updateConditional();updateProgress()});
-function updateProgress(){const visible=qs.filter(q=>!q.classList.contains('hidden'));const answered=visible.filter(q=>{const inputs=[...q.querySelectorAll('input,select,textarea')];return inputs.some(i=>i.type==='checkbox'||i.type==='radio'?i.checked:i.value.trim())}).length;document.getElementById('progressBar').style.width=(visible.length?Math.round(answered/visible.length*100):0)+'%';const firstEmpty=visible.find(q=>![...q.querySelectorAll('input,select,textarea')].some(i=>i.type==='checkbox'||i.type==='radio'?i.checked:i.value.trim()));const active=firstEmpty?.dataset.step||visible.at(-1)?.dataset.step;document.querySelectorAll('.step-item').forEach(i=>i.classList.toggle('active',i.dataset.stepname===active))}
+function updateProgress(){const visible=visibleQuestions();const answered=visible.filter(q=>{const inputs=[...q.querySelectorAll('input,select,textarea')];return inputs.some(i=>i.type==='checkbox'||i.type==='radio'?i.checked:i.value.trim())}).length;document.getElementById('progressBar').style.width=(visible.length?Math.round(answered/visible.length*100):0)+'%'}
+window.addEventListener('scroll',updateActiveStepFromScroll,{passive:true});
+window.addEventListener('resize',updateActiveStepFromScroll,{passive:true});
 function collect(){return {data:new Date().toISOString(),setor:val('setor'),cargo:val('cargo'),situacao:val('situacao'),frequencia:val('frequencia'),ferramentas:arr('ferramentas'),ferramentaOutra:val('ferramentaOutra'),acesso:val('acesso'),atividades:arr('atividades'),produtividade:val('produtividade'),qualidade:val('qualidade'),agilidade:val('agilidade'),tempo:val('tempo'),criou:val('criou'),caso:val('caso'),revisao:val('revisao'),orientacao:val('orientacao'),barreiras:arr('barreiras'),capacitacao:arr('capacitacao'),compartilha:val('compartilha'),sugestao:val('sugestao'),multiplicador:val('multiplicador'),nome:val('nome'),contato:val('contato')}}
 function makeProtocol(){const bytes=new Uint8Array(6);crypto.getRandomValues(bytes);const code=[...bytes].map(b=>(b%36).toString(36)).join('').toUpperCase();return `IA-2026-${code}`}
 async function submitToSupabase(payload,protocol){const res=await fetch(`${SUPABASE_URL}/rest/v1/mundial_ia_responses`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY,'Prefer':'return=minimal'},body:JSON.stringify({protocol,setor:payload.setor,situacao:payload.situacao,payload})});if(!res.ok){let msg='';try{msg=(await res.json())?.message||''}catch{}throw new Error(msg||`Falha no envio (${res.status})`)}}
@@ -45,4 +58,4 @@ form.addEventListener('submit',async e=>{e.preventDefault();if(!form.reportValid
 document.getElementById('saveDraft').onclick=()=>{localStorage.setItem(draftKey,JSON.stringify(collect()));burst(18)};
 function burst(n=44){const c=document.getElementById('confetti');for(let i=0;i<n;i++){const s=document.createElement('span');s.className='spark';s.style.left=Math.random()*100+'vw';s.style.top='-20px';s.style.background=['var(--cyan)','var(--violet)','var(--gold)','var(--green)'][i%4];s.style.animationDelay=(Math.random()*.35)+'s';c.appendChild(s);setTimeout(()=>s.remove(),1300)}}
 const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.14});document.querySelectorAll('.reveal').forEach(e=>obs.observe(e));
-updateConditional();updateProgress();
+updateConditional();updateProgress();updateActiveStepFromScroll();
