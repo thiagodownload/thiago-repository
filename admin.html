@@ -9,10 +9,7 @@
   <meta name="description" content="Painel executivo protegido do Diagnóstico Corporativo de Inteligência Artificial." />
   <link rel="stylesheet" href="assets/styles.css" />
   <link rel="stylesheet" href="assets/admin.css" />
-  <style>
-    .auth-secondary{display:flex;justify-content:center;margin-top:14px}.auth-secondary button{font-size:14px}
-    .recovery-copy{color:var(--muted);line-height:1.55;margin:0 0 18px}.recovery-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.recovery-actions>*{flex:1 1 180px}
-  </style>
+  <style>.auth-secondary{display:flex;justify-content:center;margin-top:14px}.auth-secondary button{font-size:14px}.recovery-copy{color:var(--muted);line-height:1.55;margin:0 0 18px}.recovery-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.recovery-actions>*{flex:1 1 180px}</style>
 </head>
 <body>
   <div class="aurora"></div><div class="particles"></div><div class="confetti" id="confetti"></div>
@@ -57,33 +54,121 @@
         <div class="navlinks"><span class="admin-status" id="adminStatus">Conectado</span><button class="ghost" id="refreshDash">Atualizar</button><button class="secondary" id="logoutButton">Sair</button></div>
       </nav>
     </header>
+
     <main>
       <section class="hero admin-hero">
         <div>
           <span class="kicker"><span class="pulse"></span> Gestão • Inteligência Artificial</span>
           <h1>Painel <span>executivo</span> de IA</h1>
-          <p class="lead">Indicadores consolidados para acompanhar adoção, valor percebido, maturidade de uso responsável e prioridades de capacitação na Mundial Atacadista.</p>
+          <p class="lead">Visão consolidada de adoção, valor percebido, governança, capacitação, cultura e oportunidades de uso de Inteligência Artificial na Mundial Atacadista.</p>
           <div class="hero-actions"><button class="cta" onclick="document.querySelector('#painel').scrollIntoView({behavior:'smooth'})">Ver indicadores</button></div>
         </div>
-        <div aria-hidden="true" class="hero-art"><img alt="" src="assets/hero-ai-logistica.webp"/><div class="orb o1"></div><div class="orb o2"></div><div class="scan"></div><div class="floating-card"><div class="metric-row"><div class="mini"><b id="adminTotalHero">0</b><span>respostas registradas</span></div><div class="mini"><b>4</b><span>dimensões executivas</span></div><div class="mini"><b>1</b><span>base central</span></div></div></div></div>
+        <div aria-hidden="true" class="hero-art"><img alt="" src="assets/hero-ai-logistica.webp"/><div class="orb o1"></div><div class="orb o2"></div><div class="scan"></div><div class="floating-card"><div class="metric-row"><div class="mini"><b id="adminTotalHero">0</b><span>respostas na visão</span></div><div class="mini"><b>5</b><span>dimensões analisadas</span></div><div class="mini"><b>1</b><span>base central</span></div></div></div></div>
       </section>
 
       <section class="dashboard show reveal" id="painel">
-        <div class="section-head"><div><span class="pill">Painel para diretoria</span><h2>Indicadores consolidados</h2></div><p>Visão consolidada da adoção, valor, governança e capacitação em Inteligência Artificial. Dados carregados diretamente da base central da pesquisa.</p></div>
-        <div class="dash-grid">
-          <div class="card kpi"><span>Total de respostas</span><b id="kpiTotal">0</b></div>
-          <div class="card kpi"><span>Adoção de IA</span><b id="kpiAdoption">0%</b></div>
-          <div class="card kpi"><span>Uso recorrente</span><b id="kpiRecurring">0%</b></div>
-          <div class="card kpi"><span>Alta validação</span><b id="kpiReview">0%</b></div>
+        <div class="section-head"><div><span class="pill">Painel para gestão</span><h2>Diagnóstico consolidado</h2></div><p>Indicadores calculados diretamente das respostas da pesquisa. Filtros e comparativos respeitam a regra de mínimo de 5 respostas para segmentações por setor.</p></div>
+
+        <div class="card filter-card">
+          <div class="filter-control"><label for="filterSector">Setor</label><select id="filterSector"><option value="">Todos os setores</option></select></div>
+          <div class="filter-control"><label for="filterPeriod">Período</label><select id="filterPeriod"><option value="0">Todo o período</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select></div>
+          <div class="filter-count" id="filterCount">0 respostas</div>
+          <button class="secondary" id="clearFilters" type="button">Limpar filtros</button>
+          <p class="filter-note" id="sectorFilterNote">Somente setores com 5 ou mais respostas aparecem no filtro.</p>
         </div>
-        <div class="grid two" style="margin-top:18px">
-          <div class="card chart-card"><h3>Principais atividades</h3><div class="bars" id="activityBars"></div></div>
-          <div class="card chart-card"><h3>Adoção por setor</h3><div class="bars" id="sectorBars"></div></div>
-          <div class="card chart-card"><h3>Ferramentas utilizadas</h3><div class="bars" id="toolBars"></div></div>
-          <div class="card chart-card"><h3>Governança</h3><div class="donut" id="govDonut"></div><div class="donut-label" id="govLabel">0%</div><p class="footer-note" style="text-align:center">% que conhecem total ou parcialmente orientações internas.</p></div>
+
+        <div class="dash-grid eight">
+          <div class="card kpi"><span>Total de respostas</span><b id="kpiTotal">0</b><small>Base da visão selecionada</small></div>
+          <div class="card kpi"><span>Adoção de IA</span><b id="kpiAdoption">0%</b><small>Utiliza IA no trabalho</small></div>
+          <div class="card kpi"><span>Uso diário</span><b id="kpiDaily">0%</b><small>Entre usuários de IA</small></div>
+          <div class="card kpi"><span>Uso recorrente</span><b id="kpiRecurring">0%</b><small>Pelo menos semanalmente</small></div>
+          <div class="card kpi"><span>Impacto médio</span><b id="kpiImpact">—</b><small>Produtividade, qualidade e agilidade</small></div>
+          <div class="card kpi"><span>Economia ≥ 2h/sem</span><b id="kpiTime">—</b><small>Entre quem estimou tempo</small></div>
+          <div class="card kpi"><span>Conhece orientações</span><b id="kpiGovernance">—</b><small>Total ou parcialmente</small></div>
+          <div class="card kpi"><span>Alta validação</span><b id="kpiReview">—</b><small>Revisa sempre ou frequentemente</small></div>
         </div>
-        <div class="card" style="margin-top:18px"><h3>Resumo executivo automático</h3><p class="lead" id="execSummary" style="font-size:17px"></p><div class="form-actions"><button class="secondary" id="exportCsv">Exportar CSV</button><button class="secondary" id="exportJson">Exportar JSON</button></div></div>
-        <div class="card" style="margin-top:18px"><h3>Últimas respostas</h3><div class="table-wrap"><table class="table"><thead><tr><th>Data</th><th>Setor</th><th>Situação</th><th>Frequência</th><th>Tempo economizado</th><th>Caso de uso</th></tr></thead><tbody id="lastRows"></tbody></table></div></div>
+
+        <div class="mini-kpi-grid">
+          <div class="card mini-kpi"><span>Acesso corporativo ou integrado</span><b id="miniCorporate">—</b></div>
+          <div class="card mini-kpi"><span>Já criou ou melhorou algo</span><b id="miniCreated">—</b></div>
+          <div class="card mini-kpi"><span>Compartilha conhecimento</span><b id="miniSharing">—</b></div>
+          <div class="card mini-kpi"><span>Demanda capacitação</span><b id="miniTraining">—</b></div>
+          <div class="card mini-kpi"><span>Potenciais multiplicadores</span><b id="miniMultipliers">0</b></div>
+        </div>
+
+        <section class="dashboard-section">
+          <div class="section-title-row"><h3>Adoção e forma de uso</h3><p>Quem utiliza IA, com qual frequência, quais ferramentas adota e por qual tipo de acesso.</p></div>
+          <div class="grid two">
+            <div class="card chart-card"><h3>Situação atual</h3><p class="chart-subtitle">Distribuição de maturidade declarada em relação à IA.</p><div class="bars" id="adoptionBars"></div></div>
+            <div class="card chart-card"><h3>Frequência de uso</h3><p class="chart-subtitle">Considera apenas quem declarou utilizar IA no trabalho.</p><div class="bars" id="frequencyBars"></div></div>
+            <div class="card chart-card"><h3>Ferramentas utilizadas</h3><p class="chart-subtitle">Múltiplas escolhas por respondente; “Outra” incorpora o nome informado.</p><div class="bars" id="toolBars"></div></div>
+            <div class="card chart-card"><h3>Tipo de acesso</h3><p class="chart-subtitle">Conta corporativa, pessoal, combinação ou integração com sistemas.</p><div class="bars" id="accessBars"></div></div>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="section-title-row"><h3>Valor percebido e produtividade</h3><p>Ganho percebido, atividades realizadas, economia de tempo e casos já criados com IA.</p></div>
+          <div class="card">
+            <h3>Impacto médio percebido</h3><p class="chart-subtitle">Escala de 1 a 5 entre usuários de IA.</p>
+            <div class="score-grid">
+              <div class="score-card" id="scoreProductivity"><span>Produtividade</span><b>—</b><div class="score-track"><i></i></div></div>
+              <div class="score-card" id="scoreQuality"><span>Qualidade</span><b>—</b><div class="score-track"><i></i></div></div>
+              <div class="score-card" id="scoreAgility"><span>Agilidade</span><b>—</b><div class="score-track"><i></i></div></div>
+            </div>
+          </div>
+          <div class="grid two" style="margin-top:18px">
+            <div class="card chart-card"><h3>Principais atividades</h3><div class="bars" id="activityBars"></div></div>
+            <div class="card chart-card"><h3>Tempo economizado por semana</h3><div class="bars" id="timeBars"></div></div>
+            <div class="card chart-card compact"><h3>Criação ou melhoria com IA</h3><div class="bars" id="createdBars"></div></div>
+            <div class="card chart-card compact"><h3>Resumo executivo automático</h3><p class="lead" id="execSummary" style="font-size:16px;line-height:1.65"></p></div>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="section-title-row"><h3>Governança e uso responsável</h3><p>Conhecimento das orientações internas e comportamento de revisão das respostas geradas por IA.</p></div>
+          <div class="grid two">
+            <div class="card chart-card"><h3>Conhecimento das orientações</h3><div class="bars" id="governanceBars"></div></div>
+            <div class="card chart-card"><h3>Revisão e validação das respostas</h3><div class="bars" id="reviewBars"></div></div>
+          </div>
+          <div class="insight-grid" style="margin-top:18px">
+            <div class="card"><h3>Sinais de atenção</h3><div class="insight-list" id="attentionList"></div></div>
+            <div class="card"><h3>Oportunidades identificadas</h3><div class="insight-list" id="opportunityList"></div></div>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="section-title-row"><h3>Barreiras, capacitação e cultura</h3><p>O que impede maior adoção, quais competências são demandadas e como o conhecimento circula internamente.</p></div>
+          <div class="grid two">
+            <div class="card chart-card"><h3>Principais barreiras</h3><div class="bars" id="barrierBars"></div></div>
+            <div class="card chart-card"><h3>Temas de capacitação</h3><div class="bars" id="trainingBars"></div></div>
+            <div class="card chart-card compact"><h3>Compartilhamento de conhecimento</h3><div class="bars" id="sharingBars"></div></div>
+            <div class="card chart-card compact"><h3>Leitura gerencial</h3><p class="lead" style="font-size:15px;line-height:1.65">Use barreiras e capacitação em conjunto: uma demanda alta por treinamento combinada com dúvidas de segurança ou falta de acesso aponta para ações diferentes. O painel evita a tradicional solução corporativa de chamar tudo de “falta de treinamento”.</p></div>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="section-title-row"><h3>Visão por setor</h3><p>Contagem de respostas por área e adoção comparativa somente quando o grupo possui tamanho mínimo adequado.</p></div>
+          <div class="grid two">
+            <div class="card chart-card"><h3>Respostas por setor</h3><div class="bars" id="sectorResponseBars"></div></div>
+            <div class="card chart-card"><h3>Adoção por setor</h3><div class="bars" id="sectorAdoptionBars"></div><p class="privacy-note">Para reduzir risco de identificação e leituras frágeis, percentuais por setor só são exibidos com pelo menos 5 respostas no grupo.</p></div>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="section-title-row"><h3>Casos de uso e voz dos colaboradores</h3><p>Conteúdo qualitativo para descobrir aplicações concretas, sugestões e pessoas dispostas a compartilhar experiências.</p></div>
+          <div class="voice-columns">
+            <div class="card"><h3>Casos de uso relatados</h3><div class="voice-list" id="caseList"></div></div>
+            <div class="card"><h3>Sugestões e preocupações</h3><div class="voice-list" id="suggestionList"></div></div>
+            <div class="card"><h3>Potenciais multiplicadores</h3><div class="voice-list" id="multiplierList"></div></div>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="card">
+            <div class="section-title-row"><div><h3>Base detalhada</h3><p style="text-align:left;margin-top:7px">Últimas 15 respostas da visão filtrada.</p></div><div class="form-actions"><button class="secondary" id="exportCsv">Exportar CSV filtrado</button><button class="secondary" id="exportJson">Exportar JSON filtrado</button></div></div>
+            <div class="table-wrap"><table class="table"><thead><tr><th>Data</th><th>Setor</th><th>Cargo</th><th>Situação</th><th>Frequência</th><th>Acesso</th><th>Tempo economizado</th><th>Caso de uso</th></tr></thead><tbody id="lastRows"></tbody></table></div>
+          </div>
+        </section>
       </section>
     </main>
   </div>
