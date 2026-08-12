@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050b18" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Mundial Atacadista | Painel Executivo de IA</title>
+  <meta name="description" content="Painel executivo protegido do Diagnóstico Corporativo de Inteligência Artificial." />
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="stylesheet" href="../assets/admin.css" />
+  <style>
+    .auth-secondary{display:flex;justify-content:center;margin-top:14px}.auth-secondary button{font-size:14px}
+    .recovery-copy{color:var(--muted);line-height:1.55;margin:0 0 18px}.recovery-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.recovery-actions>*{flex:1 1 180px}
+  </style>
+</head>
+<body>
+  <div class="aurora"></div><div class="particles"></div><div class="confetti" id="confetti"></div>
+
+  <section class="admin-login" id="loginScreen">
+    <div class="admin-login-card">
+      <div class="brand admin-login-brand"><div class="logo">M</div><div>Mundial Atacadista<small>Painel Executivo • Diagnóstico de IA</small></div></div>
+      <span class="kicker"><span class="pulse"></span> Acesso restrito • Gestão</span>
+      <h1>Área <span>administrativa</span></h1>
+      <p class="lead">Entre com a conta autorizada para consultar os indicadores consolidados e exportar as respostas da pesquisa.</p>
+      <form id="loginForm" class="admin-login-form">
+        <label>E-mail<input type="email" id="adminEmail" autocomplete="username" required placeholder="seu.email@empresa.com" /></label>
+        <label>Senha<input type="password" id="adminPassword" autocomplete="current-password" required placeholder="••••••••" /></label>
+        <button class="cta" id="loginButton" type="submit">Entrar no painel</button>
+      </form>
+      <div class="auth-secondary"><button class="ghost" id="forgotPasswordButton" type="button">Esqueci minha senha</button></div>
+      <div class="login-message" id="loginMessage" aria-live="polite"></div>
+      <p class="footer-note">O acesso aos dados é validado pelo Supabase Auth e pelas políticas de segurança do banco.</p>
+    </div>
+  </section>
+
+  <section class="admin-login hidden" id="recoveryScreen">
+    <div class="admin-login-card">
+      <div class="brand admin-login-brand"><div class="logo">M</div><div>Mundial Atacadista<small>Recuperação de acesso administrativo</small></div></div>
+      <span class="kicker"><span class="pulse"></span> Recuperação segura</span>
+      <h1>Definir <span>nova senha</span></h1>
+      <p class="recovery-copy">O link de recuperação foi validado. Defina uma nova senha para sua conta administrativa.</p>
+      <form id="recoveryForm" class="admin-login-form">
+        <label>Nova senha<input type="password" id="newPassword" autocomplete="new-password" required minlength="8" placeholder="Mínimo de 8 caracteres" /></label>
+        <label>Confirmar nova senha<input type="password" id="confirmPassword" autocomplete="new-password" required minlength="8" placeholder="Repita a nova senha" /></label>
+        <button class="cta" id="updatePasswordButton" type="submit">Atualizar senha</button>
+      </form>
+      <div class="recovery-actions"><button class="secondary" id="cancelRecovery" type="button">Voltar ao login</button></div>
+      <div class="login-message" id="recoveryMessage" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <div id="adminApp" class="hidden">
+    <header>
+      <nav class="nav">
+        <div class="brand"><div class="logo">M</div><div>Mundial Atacadista<small>Painel Executivo • Diagnóstico de IA</small></div></div>
+        <div class="navlinks"><span class="admin-status" id="adminStatus">Conectado</span><button class="ghost" id="refreshDash">Atualizar</button><button class="secondary" id="logoutButton">Sair</button></div>
+      </nav>
+    </header>
+    <main>
+      <section class="hero admin-hero">
+        <div>
+          <span class="kicker"><span class="pulse"></span> Gestão • Inteligência Artificial</span>
+          <h1>Painel <span>executivo</span> de IA</h1>
+          <p class="lead">Indicadores consolidados para acompanhar adoção, valor percebido, maturidade de uso responsável e prioridades de capacitação na Mundial Atacadista.</p>
+          <div class="hero-actions"><button class="cta" onclick="document.querySelector('#painel').scrollIntoView({behavior:'smooth'})">Ver indicadores</button></div>
+        </div>
+        <div aria-hidden="true" class="hero-art"><img alt="" src="../assets/hero-ai-logistica.webp"/><div class="orb o1"></div><div class="orb o2"></div><div class="scan"></div><div class="floating-card"><div class="metric-row"><div class="mini"><b id="adminTotalHero">0</b><span>respostas registradas</span></div><div class="mini"><b>4</b><span>dimensões executivas</span></div><div class="mini"><b>1</b><span>base central</span></div></div></div></div>
+      </section>
+
+      <section class="dashboard show reveal" id="painel">
+        <div class="section-head"><div><span class="pill">Painel para diretoria</span><h2>Indicadores consolidados</h2></div><p>Visão consolidada da adoção, valor, governança e capacitação em Inteligência Artificial. Dados carregados diretamente da base central da pesquisa.</p></div>
+        <div class="dash-grid">
+          <div class="card kpi"><span>Total de respostas</span><b id="kpiTotal">0</b></div>
+          <div class="card kpi"><span>Adoção de IA</span><b id="kpiAdoption">0%</b></div>
+          <div class="card kpi"><span>Uso recorrente</span><b id="kpiRecurring">0%</b></div>
+          <div class="card kpi"><span>Alta validação</span><b id="kpiReview">0%</b></div>
+        </div>
+        <div class="grid two" style="margin-top:18px">
+          <div class="card chart-card"><h3>Principais atividades</h3><div class="bars" id="activityBars"></div></div>
+          <div class="card chart-card"><h3>Adoção por setor</h3><div class="bars" id="sectorBars"></div></div>
+          <div class="card chart-card"><h3>Ferramentas utilizadas</h3><div class="bars" id="toolBars"></div></div>
+          <div class="card chart-card"><h3>Governança</h3><div class="donut" id="govDonut"></div><div class="donut-label" id="govLabel">0%</div><p class="footer-note" style="text-align:center">% que conhecem total ou parcialmente orientações internas.</p></div>
+        </div>
+        <div class="card" style="margin-top:18px"><h3>Resumo executivo automático</h3><p class="lead" id="execSummary" style="font-size:17px"></p><div class="form-actions"><button class="secondary" id="exportCsv">Exportar CSV</button><button class="secondary" id="exportJson">Exportar JSON</button></div></div>
+        <div class="card" style="margin-top:18px"><h3>Últimas respostas</h3><div class="table-wrap"><table class="table"><thead><tr><th>Data</th><th>Setor</th><th>Situação</th><th>Frequência</th><th>Tempo economizado</th><th>Caso de uso</th></tr></thead><tbody id="lastRows"></tbody></table></div></div>
+      </section>
+    </main>
+  </div>
+  <script src="../assets/admin.js"></script>
+</body>
+</html>
