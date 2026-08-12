@@ -27,6 +27,10 @@ if(accessQuestion){
     ['Não sei informar','Não sei informar']
   ].map(([value,label])=>`<label class="option"><input name="acesso" type="radio" value="${value}"/>${label}</label>`).join('');
 }
+const orientationQuestion=form.querySelector('input[name="orientacao"]')?.closest('.question');
+if(orientationQuestion)orientationQuestion.classList.add('hidden');
+const heroQuestionCount=document.getElementById('heroRespondents');
+if(heroQuestionCount)heroQuestionCount.textContent='16';
 let otherToolField=null;
 if(otherToolCheckbox){
   otherToolField=document.createElement('div');
@@ -70,7 +74,7 @@ form.addEventListener('change',()=>{updateConditional();updateProgress()});
 function updateProgress(){const visible=visibleQuestions();const answered=visible.filter(q=>{const inputs=[...q.querySelectorAll('input,select,textarea')];return inputs.some(i=>i.type==='checkbox'||i.type==='radio'?i.checked:i.value.trim())}).length;document.getElementById('progressBar').style.width=(visible.length?Math.round(answered/visible.length*100):0)+'%'}
 window.addEventListener('scroll',updateActiveStepFromScroll,{passive:true});
 window.addEventListener('resize',updateActiveStepFromScroll,{passive:true});
-function collect(){return {data:new Date().toISOString(),setor:val('setor')||'Não informado',cargo:val('cargo'),situacao:val('situacao'),frequencia:val('frequencia'),ferramentas:arr('ferramentas'),ferramentaOutra:val('ferramentaOutra'),acesso:val('acesso'),atividades:arr('atividades'),produtividade:val('produtividade'),qualidade:val('qualidade'),agilidade:val('agilidade'),tempo:val('tempo'),criou:val('criou'),caso:val('caso'),revisao:val('revisao'),orientacao:val('orientacao'),barreiras:arr('barreiras'),capacitacao:arr('capacitacao'),compartilha:val('compartilha'),sugestao:val('sugestao'),multiplicador:val('multiplicador'),nome:val('nome'),contato:val('contato')}}
+function collect(){return {data:new Date().toISOString(),setor:val('setor')||'Não informado',cargo:val('cargo'),situacao:val('situacao'),frequencia:val('frequencia'),ferramentas:arr('ferramentas'),ferramentaOutra:val('ferramentaOutra'),acesso:val('acesso'),atividades:arr('atividades'),produtividade:val('produtividade'),qualidade:val('qualidade'),agilidade:val('agilidade'),tempo:val('tempo'),criou:val('criou'),caso:val('caso'),revisao:val('revisao'),barreiras:arr('barreiras'),capacitacao:arr('capacitacao'),compartilha:val('compartilha'),sugestao:val('sugestao'),multiplicador:val('multiplicador'),nome:val('nome'),contato:val('contato')}}
 function makeProtocol(){const bytes=new Uint8Array(6);crypto.getRandomValues(bytes);const code=[...bytes].map(b=>(b%36).toString(36)).join('').toUpperCase();return `IA-2026-${code}`}
 async function submitToSupabase(payload,protocol){const res=await fetch(`${SUPABASE_URL}/rest/v1/mundial_ia_responses`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY,'Prefer':'return=minimal'},body:JSON.stringify({protocol,setor:payload.setor,situacao:payload.situacao,payload})});if(!res.ok){let msg='';try{msg=(await res.json())?.message||''}catch{}throw new Error(msg||`Falha no envio (${res.status})`)}}
 function setSubmitState(busy){const btn=form.querySelector('button[type="submit"]');if(!btn)return;btn.disabled=busy;btn.dataset.original=btn.dataset.original||btn.textContent;btn.textContent=busy?'Enviando resposta...':btn.dataset.original}
