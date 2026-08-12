@@ -13,6 +13,20 @@ if(sectorSelect){
   const sectorTitle=sectorSelect.closest('.question')?.querySelector('.qtitle');
   if(sectorTitle)sectorTitle.textContent=sectorTitle.textContent.replace(/\s*\*$/,'');
 }
+const accessQuestion=form.querySelector('input[name="acesso"]')?.closest('.question');
+if(accessQuestion){
+  const accessTitle=accessQuestion.querySelector('.qtitle');
+  const accessOptions=accessQuestion.querySelector('.options');
+  if(accessTitle)accessTitle.textContent='6. Como é custeado o acesso às ferramentas de IA que você utiliza no trabalho?';
+  if(accessOptions)accessOptions.innerHTML=[
+    ['Uso apenas versões gratuitas','Uso apenas versões gratuitas, sem custo pessoal'],
+    ['Pago com recursos próprios','Pago do meu próprio bolso por uma ou mais ferramentas de IA'],
+    ['Empresa disponibiliza ou paga licença','A empresa disponibiliza ou paga alguma licença/plano de IA que utilizo'],
+    ['Empresa oferece incentivo financeiro','A empresa reembolsa, subsidia ou oferece algum incentivo financeiro para uso de IA'],
+    ['Combinação de formas de acesso','Uso uma combinação das opções acima'],
+    ['Não sei informar','Não sei informar']
+  ].map(([value,label])=>`<label class="option"><input name="acesso" type="radio" value="${value}"/>${label}</label>`).join('');
+}
 let otherToolField=null;
 if(otherToolCheckbox){
   otherToolField=document.createElement('div');
