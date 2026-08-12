@@ -76,6 +76,25 @@ async function fetchResponses(token){
   return rows.map(row=>({...row.payload,data:row.payload?.data||row.created_at,created_at:row.created_at,protocol:row.protocol,setor:row.payload?.setor||row.setor,situacao:row.payload?.situacao||row.situacao}));
 }
 
+async function deleteResponseByProtocol(protocol,{allowRefresh=true}={}){
+  let s=readSession();
+  if(!s?.access_token)throw Object.assign(new Error('Sessão expirada.'),{code:401});
+  let r=await fetch(`${SUPABASE_URL}/rest/v1/mundial_ia_responses?protocol=eq.${encodeURIComponent(protocol)}`,{
+    method:'DELETE',
+    headers:{...authHeaders(s.access_token),'Prefer':'return=minimal'}
+  });
+  if(r.status===401&&allowRefresh){
+    s=await refreshSession(s);
+    r=await fetch(`${SUPABASE_URL}/rest/v1/mundial_ia_responses?protocol=eq.${encodeURIComponent(protocol)}`,{
+      method:'DELETE',
+      headers:{...authHeaders(s.access_token),'Prefer':'return=minimal'}
+    });
+  }
+  if(r.status===401)throw Object.assign(new Error('Sessão expirada.'),{code:401});
+  if(r.status===403)throw Object.assign(new Error('Acesso negado para excluir esta resposta.'),{code:403});
+  if(!r.ok){let msg='';try{msg=(await r.json())?.message||''}catch{}throw new Error(msg||`Falha ao excluir resposta (${r.status}).`)}
+}
+
 async function loadDashboard({allowRefresh=true}={}){
   let s=readSession();
   if(!s){showLogin();return}
@@ -340,7 +359,19 @@ function renderTextCards(id,items,empty){
 
 function renderRecentRows(d){
   const body=$('lastRows');if(!body)return;
-  body.innerHTML=d.slice(0,15).map(r=>`<tr><td>${formatDate(r.created_at||r.data)}</td><td>${escapeHtml(r.setor||'-')}</td><td>${escapeHtml(r.cargo||'-')}</td><td>${escapeHtml(normalizeSituation(r.situacao)||'-')}</td><td>${escapeHtml(r.frequencia||'-')}</td><td>${escapeHtml(r.acesso||'-')}</td><td>${escapeHtml(r.tempo||'-')}</td><td>${escapeHtml((r.caso||'-').slice(0,120))}</td></tr>`).join('')||'<tr><td colspan="8">Sem dados nesta visão.</td></tr>';
+  const headRow=body.closest('table')?.querySelector('thead tr');
+  if(headRow&&!headRow.querySelector('[data-admin-action]')){
+    const th=document.createElement('th');th.textContent='Ações';th.dataset.adminAction='true';headRow.appendChild(th);
+  }
+  body.innerHTML=d.slice(0,15).map(r=>`<tr><td>${formatDate(r.created_at||r.data)}</td><td>${escapeHtml(r.setor||'-')}</td><td>${escapeHtml(r.cargo||'-')}</td><td>${escapeHtml(normalizeSituation(r.situacao)||'-')}</td><td>${escapeHtml(r.frequencia||'-')}</td><td>${escapeHtml(r.acesso||'-')}</td><td>${escapeHtml(r.tempo||'-')}</td><td>${escapeHtml((r.caso||'-').slice(0,120))}</td><td><button class="secondary" type="button" data-delete-protocol="${escapeHtml(r.protocol||'')}">Excluir</button></td></tr>`).join('')||'<tr><td colspan="9">Sem dados nesta visão.</td></tr>';
+  body.onclick=async e=>{
+    const btn=e.target.closest('[data-delete-protocol]');if(!btn)return;
+    const protocol=btn.dataset.deleteProtocol;if(!protocol)return;
+    if(!confirm(`Excluir definitivamente a resposta ${protocol}?\n\nEssa ação não pode ser desfeita.`))return;
+    btn.disabled=true;const original=btn.textContent;btn.textContent='Excluindo…';setAdminStatus('Excluindo resposta…');
+    try{await deleteResponseByProtocol(protocol);await loadDashboard();setAdminStatus('Resposta excluída • dados atualizados')}
+    catch(err){btn.disabled=false;btn.textContent=original;setAdminStatus('Falha ao excluir');alert(err.message||'Não foi possível excluir a resposta.')}
+  };
 }
 
 function toCsv(rows){
