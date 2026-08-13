@@ -19,11 +19,10 @@ if(accessQuestion){
   const accessOptions=accessQuestion.querySelector('.options');
   if(accessTitle)accessTitle.textContent='6. Como é custeado o acesso às ferramentas de IA que você utiliza no trabalho?';
   if(accessOptions)accessOptions.innerHTML=[
-    ['Uso apenas versões gratuitas','Uso apenas versões gratuitas, sem custo pessoal'],
-    ['Pago com recursos próprios','Pago do meu próprio bolso por uma ou mais ferramentas de IA'],
-    ['Empresa disponibiliza ou paga licença','A empresa disponibiliza ou paga alguma licença/plano de IA que utilizo'],
-    ['Empresa oferece incentivo financeiro','A empresa reembolsa, subsidia ou oferece algum incentivo financeiro para uso de IA'],
-    ['Combinação de formas de acesso','Uso uma combinação das opções acima'],
+    ['Uso apenas versões gratuitas (sem nenhum custo financeiro)','Uso apenas versões gratuitas (sem nenhum custo financeiro)'],
+    ['Pago do meu próprio bolso (assino plano pago com recursos próprios)','Pago do meu próprio bolso (assino plano pago com recursos próprios)'],
+    ['Utilizo cupons, testes gratuitos ou parcerias temporárias','Utilizo cupons, testes gratuitos ou parcerias temporárias'],
+    ['Não utilizo ferramentas de IA no trabalho','Não utilizo ferramentas de IA no trabalho'],
     ['Não sei informar','Não sei informar']
   ].map(([value,label])=>`<label class="option"><input name="acesso" type="radio" value="${value}"/>${label}</label>`).join('');
 }
