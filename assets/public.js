@@ -83,3 +83,6 @@ document.getElementById('saveDraft').onclick=()=>{localStorage.setItem(draftKey,
 function burst(n=44){const c=document.getElementById('confetti');for(let i=0;i<n;i++){const s=document.createElement('span');s.className='spark';s.style.left=Math.random()*100+'vw';s.style.top='-20px';s.style.background=['var(--cyan)','var(--violet)','var(--gold)','var(--green)'][i%4];s.style.animationDelay=(Math.random()*.35)+'s';c.appendChild(s);setTimeout(()=>s.remove(),1300)}}
 const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.14});document.querySelectorAll('.reveal').forEach(e=>obs.observe(e));
 updateConditional();updateProgress();updateActiveStepFromScroll();
+const introPopupScript=document.createElement('script');
+introPopupScript.src='assets/intro-popup.js?v=20260812-1';
+document.body.appendChild(introPopupScript);
