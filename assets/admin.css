@@ -36,3 +36,27 @@
 @media(max-width:980px){.dash-grid,.dash-grid.eight{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-hero{min-height:auto}.filter-card{grid-template-columns:1fr 1fr}.filter-count{justify-content:center}.filter-card>.secondary{min-height:46px}.insight-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.admin-login{padding:18px 14px}.admin-login-card{padding:24px 18px;border-radius:24px}.admin-login h1{font-size:42px}.dash-grid,.dash-grid.eight{grid-template-columns:1fr 1fr}.mini-kpi-grid{grid-template-columns:1fr 1fr}.chart-card{min-height:auto}.bar-row{grid-template-columns:minmax(110px,1fr) minmax(90px,1.35fr) 66px}.admin-status{display:none}.filter-card{grid-template-columns:1fr}.filter-note{grid-column:auto}.score-grid{grid-template-columns:1fr}.voice-columns{grid-template-columns:1fr}.voice-columns>.card:last-child{grid-column:auto}.section-title-row{display:block}.section-title-row p{text-align:left;margin-top:8px}}
 @media(max-width:430px){.dash-grid,.dash-grid.eight,.mini-kpi-grid{grid-template-columns:1fr}.kpi{min-height:118px}.bar-row{grid-template-columns:1fr;gap:6px}.bar-row>b{text-align:left}.bar{height:9px}.voice-item>div{display:block}.voice-item small{display:block;text-align:left;margin-top:5px}}
+
+/* Ajuda contextual dos indicadores: somente visual, sem alterar dados ou lógica. */
+.dash-grid.eight>.kpi,.mini-kpi-grid>.mini-kpi{overflow:visible}
+.dash-grid.eight>.kpi{padding-top:24px}
+.mini-kpi-grid>.mini-kpi{padding-top:18px}
+.dash-grid.eight>.kpi:after,.mini-kpi-grid>.mini-kpi:after{display:none!important}
+.dash-grid.eight>.kpi:hover,.mini-kpi-grid>.mini-kpi:hover{z-index:30}
+.dash-grid.eight>.kpi>span:first-child,.mini-kpi-grid>.mini-kpi>span:first-child{position:static}
+.dash-grid.eight>.kpi>span:first-child:after,.mini-kpi-grid>.mini-kpi>span:first-child:after{content:"?";position:absolute;top:14px;right:14px;width:25px;height:25px;display:grid;place-items:center;padding:0;border-radius:8px;background:rgba(37,217,255,.09);border:1px solid rgba(37,217,255,.28);box-shadow:0 0 18px rgba(37,217,255,.08);color:#bff3ff;font-size:13px;font-weight:950;line-height:1;text-transform:none;letter-spacing:0;cursor:help;transition:.18s;z-index:6}
+.dash-grid.eight>.kpi>span:first-child:hover:after,.mini-kpi-grid>.mini-kpi>span:first-child:hover:after{background:rgba(37,217,255,.17);border-color:rgba(37,217,255,.52);box-shadow:0 0 22px rgba(37,217,255,.16);transform:translateY(-1px)}
+.dash-grid.eight>.kpi>span:first-child:before,.mini-kpi-grid>.mini-kpi>span:first-child:before{content:var(--metric-tooltip,"");position:absolute;top:46px;right:14px;width:min(320px,calc(100vw - 48px));padding:11px 13px;border-radius:13px;background:#07142b;border:1px solid rgba(37,217,255,.28);box-shadow:0 18px 50px rgba(0,0,0,.42);color:#dcecff;font-size:12px;font-weight:650;line-height:1.45;text-align:left;text-transform:none;letter-spacing:0;white-space:normal;opacity:0;visibility:hidden;transform:translateY(-5px);transition:opacity .16s,transform .16s,visibility .16s;pointer-events:none;z-index:25}
+.dash-grid.eight>.kpi>span:first-child:hover:before,.mini-kpi-grid>.mini-kpi>span:first-child:hover:before{opacity:1;visibility:visible;transform:none}
+.dash-grid.eight>.kpi:nth-child(1){--metric-tooltip:"Base geral: indicador calculado com base no total de respostas da visão selecionada."}
+.dash-grid.eight>.kpi:nth-child(2){--metric-tooltip:"Pergunta 3: Qual alternativa melhor representa sua situação atual em relação ao uso de IA no trabalho?"}
+.dash-grid.eight>.kpi:nth-child(3){--metric-tooltip:"Pergunta 4: Com que frequência você utiliza ferramentas de IA para atividades profissionais?"}
+.dash-grid.eight>.kpi:nth-child(4){--metric-tooltip:"Pergunta 4: Com que frequência você utiliza ferramentas de IA para atividades profissionais?"}
+.dash-grid.eight>.kpi:nth-child(5){--metric-tooltip:"Pergunta 8: Como você avalia o impacto da IA nos aspectos abaixo?"}
+.dash-grid.eight>.kpi:nth-child(6){--metric-tooltip:"Pergunta 9: Aproximadamente quanto tempo você acredita que economiza por semana usando IA?"}
+.dash-grid.eight>.kpi:nth-child(8){--metric-tooltip:"Pergunta 11: Antes de usar uma resposta gerada por IA, com que frequência você revisa ou valida o resultado?"}
+.mini-kpi-grid>.mini-kpi:nth-child(2){--metric-tooltip:"Pergunta 10: Você já utilizou IA para criar ou melhorar algo usado no seu trabalho ou pela equipe?"}
+.mini-kpi-grid>.mini-kpi:nth-child(3){--metric-tooltip:"Pergunta 14: Você costuma compartilhar com colegas formas de usar IA, prompts, exemplos ou boas práticas?"}
+.mini-kpi-grid>.mini-kpi:nth-child(4){--metric-tooltip:"Pergunta 13: Em quais temas de IA você teria interesse em receber capacitação?"}
+.mini-kpi-grid>.mini-kpi:nth-child(5){--metric-tooltip:"Pergunta 16: Você criou algum caso de uso interessante e estaria disponível para compartilhar com a empresa?"}
+@media(max-width:760px){.dash-grid.eight>.kpi>span:first-child:before,.mini-kpi-grid>.mini-kpi>span:first-child:before{right:10px;width:min(280px,calc(100vw - 40px))}}
